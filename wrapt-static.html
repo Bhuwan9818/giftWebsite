@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wrapt — Gift Hampers, Thoughtfully Curated</title>
+<meta name="description" content="Wrapt curates gift hampers and individually wrapped gifts for birthdays, festivals, weddings and corporate giving.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===========================================================
+   WRAPT — Gift Hampers — design tokens
+   =========================================================== */
+:root{
+  --ink: #21301F;
+  --ink-soft: #3a4a36;
+  --cream: #F6F1E7;
+  --paper: #FFFDF8;
+  --berry: #8C2F39;
+  --berry-deep: #5e1f27;
+  --gold: #C89B3C;
+  --gold-soft: #e3c789;
+  --sage: #6B7F5B;
+  --line: rgba(33,48,31,0.12);
+
+  --display: 'Bricolage Grotesque', 'Segoe UI', sans-serif;
+  --body: 'Inter', 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+
+  --radius: 18px;
+  --radius-sm: 10px;
+  --shadow-soft: 0 18px 40px -20px rgba(33,48,31,0.35);
+  --shadow-lift: 0 28px 60px -24px rgba(33,48,31,0.45);
+  --ease: cubic-bezier(.22,1,.36,1);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+body{
+  margin:0;
+  font-family: var(--body);
+  color: var(--ink);
+  background: var(--cream);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+ul{ margin:0; padding:0; list-style:none; }
+button{ font-family: inherit; cursor:pointer; border:none; background:none; }
+h1,h2,h3,h4{ font-family: var(--display); margin:0; line-height:1.05; }
+p{ margin:0; }
+:focus-visible{ outline: 3px solid var(--berry); outline-offset: 3px; border-radius: 4px; }
+
+.wrap{ width:100%; max-width: 1180px; margin:0 auto; padding: 0 28px; }
+
+.eyebrow{
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--berry);
+  display:flex; align-items:center; gap:10px;
+}
+.eyebrow::before{ content:''; width:18px; height:1px; background: var(--berry); display:inline-block; }
+
+.section-head{ max-width: 620px; margin-bottom: 48px; }
+.section-head h2{ font-size: clamp(1.9rem, 3.4vw, 2.8rem); margin-top: 12px; letter-spacing: -0.01em; }
+.section-head p{ margin-top: 14px; color: var(--ink-soft); font-size: 1.02rem; line-height: 1.6; }
+.section-head.center{ margin-inline:auto; text-align:center; }
+
+.scallop{
+  width:100%; height: 22px; background-color: var(--paper);
+  -webkit-mask-image: radial-gradient(circle at 11px 0, transparent 11px, black 11.5px);
+  mask-image: radial-gradient(circle at 11px 0, transparent 11px, black 11.5px);
+  -webkit-mask-size: 22px 22px; mask-size: 22px 22px;
+  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+}
+.scallop.flip{ transform: scaleY(-1); }
+
+.reveal{ opacity:0; transform: translateY(28px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.reveal.in-view{ opacity:1; transform:none; }
+.reveal-stagger > *{ transition-delay: calc(var(--i,0) * 80ms); }
+
+/* ===== Header ===== */
+.site-header{ position: fixed; top:0; left:0; right:0; z-index: 100; padding: 22px 0; transition: padding .35s var(--ease), background .35s var(--ease), box-shadow .35s var(--ease); }
+.site-header.scrolled{ padding: 12px 0; background: rgba(246,241,231,0.86); backdrop-filter: blur(14px) saturate(140%); box-shadow: 0 1px 0 var(--line); }
+.header-inner{ display:flex; align-items:center; justify-content:space-between; }
+.logo{ font-family: var(--display); font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; display:flex; align-items:center; gap:9px; }
+.logo .dot{ width:9px; height:9px; border-radius:50%; background: var(--berry); display:inline-block; transform: translateY(-2px); }
+.nav-links{ display:flex; gap: 34px; font-size: 0.94rem; }
+.nav-links a{ position:relative; padding: 4px 0; color: var(--ink-soft); transition: color .25s var(--ease); }
+.nav-links a::after{ content:''; position:absolute; left:0; right:0; bottom:-2px; height:2px; background: var(--berry); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease); }
+.nav-links a:hover{ color: var(--ink); }
+.nav-links a:hover::after{ transform: scaleX(1); }
+.header-actions{ display:flex; align-items:center; gap:18px; }
+.cart-btn{ position:relative; display:flex; align-items:center; gap:8px; font-size:0.9rem; }
+.cart-count{ background: var(--berry); color:#fff; font-family: var(--mono); font-size: 0.68rem; width:18px;height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition: transform .25s var(--ease); }
+.cart-btn.bump .cart-count{ transform: scale(1.4); }
+.btn{ display:inline-flex; align-items:center; gap:8px; padding: 13px 24px; border-radius: 999px; font-size: 0.92rem; font-weight: 600; transition: transform .3s var(--ease), box-shadow .3s var(--ease), background .3s var(--ease); }
+.btn-primary{ background: var(--berry); color: var(--paper); box-shadow: var(--shadow-soft); }
+.btn-primary:hover{ transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.btn-ghost{ border: 1.4px solid var(--ink); color: var(--ink); }
+.btn-ghost:hover{ background: var(--ink); color: var(--paper); }
+.btn-sm{ padding: 9px 16px; font-size: 0.82rem; }
+.menu-toggle{ display:none; flex-direction:column; gap:5px; padding:6px; }
+.menu-toggle span{ width:22px; height:2px; background:var(--ink); border-radius:2px; transition: transform .3s var(--ease), opacity .3s var(--ease); }
+
+/* ===== Hero ===== */
+.hero{ position:relative; padding: 168px 0 0; overflow:hidden; min-height: 92vh; display:flex; align-items:center; }
+.hero-bg{ position:absolute; inset:0; z-index:0; }
+.hero-bg img{ width:100%; height:100%; object-fit: cover; transform: scale(1.04); animation: heroZoom 16s ease-in-out infinite alternate; }
+@keyframes heroZoom{ from{ transform: scale(1.04); } to{ transform: scale(1.12); } }
+.hero-bg::after{
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(100deg, rgba(33,48,31,0.92) 0%, rgba(33,48,31,0.78) 32%, rgba(33,48,31,0.25) 62%, rgba(33,48,31,0.08) 100%);
+}
+.hero-inner{ position:relative; z-index:1; padding-bottom: 90px; width:100%; }
+.hero-copy{ max-width: 620px; }
+.hero-copy .eyebrow{ color: var(--gold-soft); margin-bottom: 18px; }
+.hero-copy .eyebrow::before{ background: var(--gold-soft); }
+.hero h1{ color: var(--paper); font-size: clamp(2.6rem, 5.4vw, 4.4rem); letter-spacing: -0.02em; }
+.hero h1 em{ font-style: italic; color: var(--gold-soft); }
+.hero-copy p{ margin-top: 22px; max-width: 460px; font-size: 1.08rem; line-height: 1.65; color: rgba(246,241,231,0.88); }
+.hero-cta{ display:flex; gap:16px; margin-top: 34px; flex-wrap:wrap; }
+.hero-cta .btn-ghost{ border-color: rgba(246,241,231,0.7); color: var(--paper); }
+.hero-cta .btn-ghost:hover{ background: var(--paper); color: var(--ink); }
+.hero-stats{ display:flex; gap: 36px; margin-top: 54px; }
+.hero-stats div{ display:flex; flex-direction:column; }
+.stat-num{ font-family: var(--display); font-size: 1.7rem; font-weight:600; color: var(--paper); }
+.stat-label{ font-size: 0.78rem; color: rgba(246,241,231,0.75); margin-top: 2px; }
+
+/* trust marquee */
+.trust-strip{ background: var(--ink); color: var(--cream); padding: 16px 0; overflow:hidden; position:relative; z-index:1; }
+.trust-track{ display:flex; gap: 64px; white-space:nowrap; animation: marquee 26s linear infinite; font-family: var(--mono); font-size: 0.82rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.trust-track span{ display:flex; align-items:center; gap:10px; opacity:0.9; }
+.trust-track span::before{ content:'✦'; color: var(--gold); }
+@keyframes marquee{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
+
+/* ===== Products ===== */
+.section{ padding: 96px 0; background: var(--paper); }
+.section.alt{ background: var(--cream); }
+
+.product-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 26px 22px; }
+.card{ position:relative; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 0 20px; overflow: visible; transition: transform .4s var(--ease), box-shadow .4s var(--ease); }
+.card:hover{ transform: translateY(-6px); box-shadow: var(--shadow-soft); }
+
+.card-art{ height: 190px; border-radius: var(--radius) var(--radius) 0 0; position:relative; overflow:hidden; }
+.card-art img{ width:100%; height:100%; object-fit:cover; transition: transform .6s var(--ease); }
+.card:hover .card-art img{ transform: scale(1.08); }
+.card-art::after{ content:''; position:absolute; inset:0; background: linear-gradient(180deg, rgba(33,48,31,0) 55%, rgba(33,48,31,0.32) 100%); }
+.card-badge{ position:absolute; top:12px; left:12px; z-index:2; background: var(--paper); color: var(--berry); font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; box-shadow: 0 6px 14px -8px rgba(0,0,0,0.3); }
+
+.gift-tag{ position:absolute; top: -14px; right: 18px; z-index: 5; transform-origin: top center; transition: transform .35s var(--ease); }
+.card:hover .gift-tag{ transform: rotate(8deg); }
+.gift-tag .string{ width:1px; height:16px; background: var(--ink-soft); margin: 0 auto; }
+.gift-tag .tag-body{ background: #EDE0C8; border: 1px solid rgba(33,48,31,0.18); padding: 6px 11px 7px; border-radius: 5px 5px 5px 1px; font-family: var(--mono); font-size: 0.78rem; font-weight: 600; position:relative; box-shadow: 0 6px 12px -6px rgba(0,0,0,0.25); }
+.gift-tag .tag-body::before{ content:''; position:absolute; top:5px; left: 50%; transform: translateX(-50%); width: 5px; height:5px; border-radius:50%; background: var(--paper); border: 1px solid rgba(33,48,31,0.3); }
+
+.card-body{ padding: 18px 18px 0; }
+.card-cat{ font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sage); }
+.card-body h3{ font-size: 1.08rem; margin-top: 6px; font-weight: 600; }
+.card-body p{ font-size: 0.88rem; color: var(--ink-soft); margin-top: 6px; line-height: 1.5; }
+.card-foot{ display:flex; align-items:center; justify-content:space-between; margin-top: 16px; padding: 0 18px; }
+.price{ font-weight:700; font-size:1.02rem; }
+.add-btn{ width: 36px; height:36px; border-radius:50%; background: var(--cream); display:flex; align-items:center; justify-content:center; transition: background .3s var(--ease), transform .3s var(--ease), color .3s var(--ease); color: var(--ink); }
+.add-btn:hover{ background: var(--berry); color:#fff; transform: rotate(90deg); }
+
+.filter-row{ display:flex; gap:10px; margin-bottom: 36px; flex-wrap:wrap; }
+.filter-chip{ padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line); font-size: 0.85rem; transition: background .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease); }
+.filter-chip.active, .filter-chip:hover{ background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+/* ===== Hampers ===== */
+.hamper-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.hamper-card{ position:relative; border-radius: var(--radius); padding: 26px 22px 24px; color: var(--paper); overflow:hidden; min-height: 400px; display:flex; flex-direction:column; justify-content:flex-end; transition: transform .45s var(--ease), box-shadow .45s var(--ease); isolation:isolate; }
+.hamper-card:hover{ transform: translateY(-8px) scale(1.015); box-shadow: var(--shadow-lift); }
+.hamper-bg{ position:absolute; inset:0; z-index:-2; }
+.hamper-bg img{ width:100%; height:100%; object-fit:cover; transition: transform .6s var(--ease); }
+.hamper-card:hover .hamper-bg img{ transform: scale(1.08); }
+.hamper-card::before{ content:''; position:absolute; inset:0; z-index:-1; background: linear-gradient(190deg, rgba(33,48,31,0.05) 0%, rgba(20,28,18,0.92) 78%); }
+.hamper-ribbon-corner{ position:absolute; top: 0; right: 0; width: 90px; height: 90px; overflow:hidden; z-index:2; }
+.hamper-ribbon-corner span{ position:absolute; top: 18px; right: -28px; width: 130px; text-align:center; transform: rotate(45deg); font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 0; font-weight:700; color: var(--ink); background: var(--gold); }
+.hamper-occasion{ font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.9; }
+.hamper-card h3{ font-size: 1.5rem; margin-top: 8px; }
+.hamper-card p.desc{ font-size: 0.88rem; opacity: 0.92; margin-top: 8px; line-height: 1.5; max-width: 220px; }
+.hamper-meta{ display:flex; align-items:baseline; gap: 10px; margin-top: 18px; }
+.hamper-price{ font-size: 1.4rem; font-weight:700; }
+.hamper-old{ font-size: 0.88rem; text-decoration: line-through; opacity: 0.65; }
+.hamper-items{ font-family: var(--mono); font-size: 0.72rem; opacity: 0.8; margin-top: 2px; }
+.hamper-card .btn{ margin-top: 18px; background: var(--paper); color: var(--ink); align-self: flex-start; padding: 10px 18px; font-size: 0.84rem; }
+.hamper-card .btn:hover{ background: var(--gold); color: var(--ink); transform: translateY(-2px); }
+
+/* ===== Process ===== */
+.process-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 0; position:relative; }
+.process-step{ position:relative; padding: 0 22px; border-left: 1px dashed var(--line); }
+.process-step:first-child{ border-left:none; padding-left:0; }
+.step-num{ font-family: var(--mono); font-size: 0.78rem; color: var(--berry); letter-spacing: 0.05em; }
+.process-step h4{ font-size: 1.12rem; margin-top: 14px; }
+.process-step p{ font-size: 0.9rem; color: var(--ink-soft); margin-top: 8px; line-height: 1.55; }
+
+/* ===== Testimonials ===== */
+.testimonial-wrap{ max-width: 720px; margin: 0 auto; text-align:center; position:relative; }
+.testimonial-slide{ display:none; animation: fadeUp .5s var(--ease); }
+.testimonial-slide.active{ display:block; }
+@keyframes fadeUp{ from{ opacity:0; transform: translateY(12px); } to{ opacity:1; transform:none; } }
+.testimonial-slide p{ font-family: var(--display); font-size: clamp(1.25rem, 2.4vw, 1.7rem); line-height: 1.5; font-style: italic; }
+.testimonial-author{ margin-top: 22px; font-family: var(--mono); font-size: 0.82rem; color: var(--ink-soft); }
+.testimonial-dots{ display:flex; justify-content:center; gap:10px; margin-top: 34px; }
+.testimonial-dots button{ width:8px; height:8px; border-radius:50%; background: var(--line); transition: background .3s var(--ease), transform .3s var(--ease); }
+.testimonial-dots button.active{ background: var(--berry); transform: scale(1.3); }
+
+/* ===== Contact ===== */
+.contact-block{ display:grid; grid-template-columns: 0.9fr 1.1fr; gap: 50px; align-items:start; }
+.contact-copy h2{ font-size: clamp(1.8rem, 3vw, 2.5rem); }
+.contact-copy p{ margin-top:16px; color: var(--ink-soft); line-height:1.6; }
+.contact-perks{ margin-top: 28px; display:flex; flex-direction:column; gap:14px; }
+.contact-perks li{ display:flex; align-items:center; gap:10px; font-size:0.92rem; }
+.contact-perks li::before{ content:''; width: 7px; height:7px; background: var(--gold); border-radius:50%; flex-shrink:0; }
+.form-card{ background: var(--ink); color: var(--cream); border-radius: var(--radius); padding: 36px; }
+.form-row{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+.field{ margin-bottom: 16px; }
+.field label{ display:block; font-size: 0.78rem; font-family: var(--mono); text-transform:uppercase; letter-spacing: 0.05em; opacity: 0.75; margin-bottom: 7px; }
+.field input, .field textarea{ width:100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18); border-radius: var(--radius-sm); padding: 12px 14px; color: var(--cream); font-family: var(--body); font-size: 0.94rem; transition: border-color .25s var(--ease), background .25s var(--ease); }
+.field input::placeholder, .field textarea::placeholder{ color: rgba(246,241,231,0.45); }
+.field input:focus, .field textarea:focus{ border-color: var(--gold); background: rgba(255,255,255,0.1); outline:none; }
+.field textarea{ resize: vertical; min-height: 96px; }
+.form-status{ margin-top: 4px; font-size: 0.86rem; min-height: 20px; }
+.form-status.success{ color: var(--gold-soft); }
+.form-status.error{ color: #e08a8a; }
+.form-card .btn-primary{ width:100%; justify-content:center; margin-top:6px; }
+
+/* ===== Footer ===== */
+footer{ background: var(--ink); color: var(--cream); padding: 64px 0 28px; }
+.footer-grid{ display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(246,241,231,0.14); }
+.footer-logo{ font-family: var(--display); font-size: 1.5rem; }
+.footer-grid p{ margin-top:14px; color: rgba(246,241,231,0.65); font-size:0.9rem; line-height:1.6; max-width:280px; }
+.footer-col h5{ font-family: var(--mono); font-size: 0.74rem; text-transform:uppercase; letter-spacing:0.06em; opacity:0.7; margin-bottom:16px; }
+.footer-col ul{ display:flex; flex-direction:column; gap:10px; }
+.footer-col a{ font-size:0.9rem; color: rgba(246,241,231,0.85); transition: color .25s var(--ease), padding-left .25s var(--ease); }
+.footer-col a:hover{ color: var(--gold-soft); padding-left:4px; }
+.footer-bottom{ display:flex; justify-content:space-between; align-items:center; padding-top: 24px; font-size: 0.82rem; color: rgba(246,241,231,0.55); flex-wrap:wrap; gap:12px; }
+.social-row{ display:flex; gap:14px; }
+.social-row a{ width:34px; height:34px; border-radius:50%; border:1px solid rgba(246,241,231,0.2); display:flex; align-items:center; justify-content:center; transition: background .25s var(--ease), transform .25s var(--ease); }
+.social-row a:hover{ background: var(--berry); transform: translateY(-3px); }
+
+/* toast */
+.toast{ position:fixed; bottom: 28px; left:50%; transform: translate(-50%, 20px); background: var(--ink); color: var(--cream); padding: 14px 22px; border-radius: 999px; font-size: 0.88rem; display:flex; align-items:center; gap:10px; box-shadow: var(--shadow-lift); opacity:0; pointer-events:none; transition: opacity .35s var(--ease), transform .35s var(--ease); z-index: 200; }
+.toast.show{ opacity:1; transform: translate(-50%, 0); pointer-events:auto; }
+.toast .dot{ width:8px; height:8px; border-radius:50%; background: var(--gold); }
+
+/* ===== Responsive ===== */
+@media (max-width: 980px){
+  .product-grid{ grid-template-columns: repeat(2,1fr); }
+  .hamper-grid{ grid-template-columns: repeat(2,1fr); }
+  .process-grid{ grid-template-columns: repeat(2,1fr); row-gap: 36px; }
+  .process-step:nth-child(3){ border-left:none; }
+  .contact-block{ grid-template-columns: 1fr; }
+  .footer-grid{ grid-template-columns: 1fr 1fr; row-gap:30px; }
+  .hero{ min-height: 86vh; }
+}
+@media (max-width: 680px){
+  .nav-links{ display:none; }
+  .menu-toggle{ display:flex; }
+  .header-actions .btn-ghost{ display:none; }
+  .product-grid{ grid-template-columns: 1fr 1fr; }
+  .hamper-grid{ grid-template-columns: 1fr; }
+  .process-grid{ grid-template-columns: 1fr; }
+  .process-step{ border-left:none !important; padding-left:0; }
+  .form-row{ grid-template-columns: 1fr; }
+  .footer-grid{ grid-template-columns: 1fr; }
+  .hero{ padding-top: 140px; min-height: 80vh; }
+  .hero-stats{ flex-wrap:wrap; gap:22px; }
+}
+
+.mobile-nav{ position: fixed; top:0; right:0; height: 100vh; width: min(78vw, 320px); background: var(--ink); color: var(--cream); z-index: 150; padding: 100px 32px 32px; transform: translateX(100%); transition: transform .4s var(--ease); display:flex; flex-direction:column; gap: 26px; }
+.mobile-nav.open{ transform: translateX(0); }
+.mobile-nav a{ font-size: 1.1rem; }
+.nav-overlay{ position:fixed; inset:0; background: rgba(0,0,0,0.35); z-index: 140; opacity:0; pointer-events:none; transition: opacity .35s var(--ease); }
+.nav-overlay.open{ opacity:1; pointer-events:auto; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="#top" class="logo"><span class="dot"></span>Wrapt</a>
+    <nav class="nav-links">
+      <a href="#products">Products</a>
+      <a href="#hampers">Hampers</a>
+      <a href="#process">How it works</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <a href="#contact" class="btn btn-ghost btn-sm">Custom Hamper</a>
+      <button class="cart-btn" aria-label="View basket">🧺 <span class="cart-count">0</span></button>
+      <button class="menu-toggle" aria-label="Open menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="nav-overlay"></div>
+<nav class="mobile-nav">
+  <a href="#products">Products</a>
+  <a href="#hampers">Hampers</a>
+  <a href="#process">How it works</a>
+  <a href="#contact">Contact</a>
+  <a href="#contact" class="btn btn-primary btn-sm">Custom Hamper</a>
+</nav>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="hero-bg">
+      <img src="https://images.unsplash.com/photo-1773450970981-793e2d72d820?w=2000&q=80&auto=format&fit=crop" alt="Gourmet gift box with assorted treats and fruit">
+    </div>
+    <div class="wrap hero-inner">
+      <div class="hero-copy reveal in-view">
+        <p class="eyebrow">Gift Hampers &amp; Curated Gifting</p>
+        <h1>Gifts that get <em>opened</em> twice — once for the box, once for what's inside.</h1>
+        <p>Wrapt designs gift hampers and standalone gifts for birthdays, weddings, festivals and corporate giving — handpicked, hand-wrapped, and never generic.</p>
+        <div class="hero-cta">
+          <a href="#hampers" class="btn btn-primary">Shop Hampers</a>
+          <a href="#products" class="btn btn-ghost">Browse Products</a>
+        </div>
+        <div class="hero-stats">
+          <div><span class="stat-num"><span data-count="6200" data-suffix="+">0</span></span><span class="stat-label">Hampers delivered</span></div>
+          <div><span class="stat-num"><span data-count="48">0</span></span><span class="stat-label">Curated designs</span></div>
+          <div><span class="stat-num"><span data-count="98" data-suffix="%">0</span></span><span class="stat-label">Repeat customers</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="trust-strip">
+    <div class="trust-track">
+      <span>Hand-wrapped, every order</span>
+      <span>Same-day dispatch in metro cities</span>
+      <span>Free personalised gift note</span>
+      <span>Corporate bulk pricing available</span>
+      <span>Hand-wrapped, every order</span>
+      <span>Same-day dispatch in metro cities</span>
+      <span>Free personalised gift note</span>
+      <span>Corporate bulk pricing available</span>
+    </div>
+  </div>
+
+  <div class="scallop" aria-hidden="true"></div>
+
+  <!-- ============ PRODUCTS ============ -->
+  <section id="products" class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">From the shop</p>
+        <h2>Gifts you can send on their own</h2>
+        <p>Every item below also goes into our hampers — buy individually, or let us bundle them for you.</p>
+      </div>
+
+      <div class="filter-row reveal">
+        <button class="filter-chip active" data-filter="all">All</button>
+        <button class="filter-chip" data-filter="Gourmet">Gourmet</button>
+        <button class="filter-chip" data-filter="Wrapping">Wrapping</button>
+        <button class="filter-chip" data-filter="Home & Garden">Home &amp; Garden</button>
+        <button class="filter-chip" data-filter="Fruit">Fruit</button>
+        <button class="filter-chip" data-filter="Candles">Candles</button>
+        <button class="filter-chip" data-filter="Flowers">Flowers</button>
+      </div>
+
+      <div class="product-grid reveal-stagger">
+
+        <article class="card reveal" data-category="Gourmet">
+          <div class="gift-tag"><div class="string"></div><div class="tag-body">₹1,199</div></div>
+          <div class="card-art">
+            <span class="card-badge">Bestseller</span>
+            <img src="https://images.unsplash.com/photo-1649789093457-3a973148fa27?w=800&q=80&auto=format&fit=crop" alt="Gourmet picnic basket with bread, tomatoes and wine">
+          </div>
+          <div class="card-body">
+            <p class="card-cat">Gourmet</p>
+            <h3>Gourmet Picnic Basket</h3>
+            <p>Artisan bread, wine and seasonal produce.</p>
+          </div>
+          <div class="card-foot"><span class="price">₹1,199</span><button class="add-btn" aria-label="Add to basket">+</button></div>
+        </article>
+
+        <article class="card reveal" data-category="Wrapping">
+          <div class="gift-tag"><div class="string"></div><div class="tag-body">₹399</div></div>
+          <div class="card-art">
+            <img src="https://images.unsplash.com/photo-1668127039849-c5dd95be3fa5?w=800&q=80&auto=format&fit=crop" alt="Wrapped gift box with green ribbon">
+          </div>
+          <div class="card-body">
+            <p class="card-cat">Wrapping</p>
+            <h3>Signature Wrapped Box</h3>
+            <p>Hand-tied ribbon, our house wrap style.</p>
+          </div>
+          <div class="card-foot"><span class="price">₹399</span><button class="add-btn" aria-label="Add to basket">+</button></div>
+        </article>
+
+        <article class="card reveal" data-category="Home & Garden">
+          <div class="gift-tag"><div class="string"></div><div class="tag-body">₹549</div></div>
+          <div class="card-art">
+            <span class="card-badge">New</span>
+            <img src="https://images.unsplash.com/photo-1668127573929-b66cc85a7356?w=800&q=80&auto=format&fit=crop" alt="Potted plant gift box">
+          </div>
+          <div class="card-body">
+            <p class="card-cat">Home &amp; Garden</p>
+            <h3>Potted Plant Gift Box</h3>
+            <p>A living gift, boxed and ready to grow.</p>
+          </div>
+          <div class="card-foot"><span class="price">₹549</span><button class="add-btn" aria-label="Add to basket">+</button></div>
+        </article>
+
+        <article class="card reveal" data-category="Fruit">
+          <div class="gift-tag"><div class="string"></div><div class="tag-body">₹899</div></div>
+          <div class="card-art">
+            <img src="https://images.unsplash.com/photo-1617394391227-4cb6cba53b12?w=800&q=80&auto=format&fit=crop" alt="Wicker basket with fresh fruit">
+          </div>
+          <div class="card-body">
+            <p class="card-cat">Fruit</p>
+            <h3>Fresh Fruit Basket</h3>
+            <p>Hand-picked seasonal fruit, wicker basket.</p>
+          </div>
+          <div class="card-foot"><span class="price">₹899</span><button class="add-btn" aria-label="Add to basket">+</button></div>
+        </article>
+
+        <article class="card reveal" data-category="Candles">
+          <div class="gift-tag"><div class="string"></div><div class="tag-body">₹649</div></div>
+          <div class="card-art">
+            <span class="card-badge">Bestseller</span>
+            <img src="https://images.unsplash.com/photo-1601479604588-68d9e6d386b5?w=800&q=80&auto=format&fit=crop" alt="Pillar candle set on wooden table">
+          </div>
+          <div class="card-body">
+            <p class="card-cat">Candles</p>
+            <h3>Cozy Candle Set</h3>
+            <p>Three hand-poured pillar candles.</p>
+          </div>
+          <div class="card-foot"><span class="price">₹649</span><button class="add-btn" aria-label="Add to basket">+</button></div>
+        </article>
+
+        <article class="card reveal" data-category="Flowers">
+          <div class="gift-tag"><div class="string"></div><div class="tag-body">₹449</div></div>
+          <div class="card-art">
+            <img src="https://images.unsplash.com/photo-1668127693714-791b24af126a?w=800&q=80&auto=format&fit=crop" alt="Single rose gift box">
+          </div>
+          <div class="card-body">
+            <p class="card-cat">Flowers</p>
+            <h3>Rose &amp; Bloom Box</h3>
+            <p>A single statement rose, boxed.</p>
+          </div>
+          <div class="card-foot"><span class="price">₹449</span><button class="add-btn" aria-label="Add to basket">+</button></div>
+        </article>
+
+        <article class="card reveal" data-category="Candles">
+          <div class="gift-tag"><div class="string"></div><div class="tag-body">₹299</div></div>
+          <div class="card-art">
+            <img src="https://images.unsplash.com/photo-1528351655744-27cc30462816?w=800&q=80&auto=format&fit=crop" alt="Tea light candle set">
+          </div>
+          <div class="card-body">
+            <p class="card-cat">Candles</p>
+            <h3>Tealight Gift Set</h3>
+            <p>Set of six, unscented, slow-burning.</p>
+          </div>
+          <div class="card-foot"><span class="price">₹299</span><button class="add-btn" aria-label="Add to basket">+</button></div>
+        </article>
+
+        <article class="card reveal" data-category="Wrapping">
+          <div class="gift-tag"><div class="string"></div><div class="tag-body">₹149</div></div>
+          <div class="card-art">
+            <img src="https://images.unsplash.com/photo-1668127039852-0e7c8b3a1601?w=800&q=80&auto=format&fit=crop" alt="Ribbon trim add-on">
+          </div>
+          <div class="card-body">
+            <p class="card-cat">Wrapping</p>
+            <h3>Ribbon Trim Add-on</h3>
+            <p>Add a satin ribbon to any order.</p>
+          </div>
+          <div class="card-foot"><span class="price">₹149</span><button class="add-btn" aria-label="Add to basket">+</button></div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="scallop flip" aria-hidden="true"></div>
+
+  <!-- ============ HAMPERS ============ -->
+  <section id="hampers" class="section alt">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Our signature</p>
+        <h2>Gift hampers, built around an occasion</h2>
+        <p>Each hamper is a pre-styled bundle. Like the direction but not the exact contents? Tell us and we'll customise it.</p>
+      </div>
+
+      <div class="hamper-grid reveal-stagger">
+
+        <article class="hamper-card reveal">
+          <div class="hamper-bg"><img src="https://images.unsplash.com/photo-1508899203029-1c9eb493c9bd?w=900&q=80&auto=format&fit=crop" alt="Classic wrapped gift basket"></div>
+          <div class="hamper-ribbon-corner"><span>Popular</span></div>
+          <p class="hamper-occasion">Birthdays</p>
+          <h3>The Birthday Edit</h3>
+          <p class="desc">Candle, truffle box, mug, card &amp; confetti.</p>
+          <div class="hamper-meta"><span class="hamper-price">₹1,899</span><span class="hamper-old">₹2,300</span></div>
+          <p class="hamper-items">5 curated items</p>
+          <button class="btn btn-sm" data-customize="The Birthday Edit">Customize this hamper</button>
+        </article>
+
+        <article class="hamper-card reveal">
+          <div class="hamper-bg"><img src="https://images.unsplash.com/photo-1668432321756-5109ad1f5916?w=900&q=80&auto=format&fit=crop" alt="Festive gift basket beside a Christmas tree"></div>
+          <p class="hamper-occasion">Festive Season</p>
+          <h3>The Festive Glow</h3>
+          <p class="desc">Two candles, cookie tin, chai, coasters.</p>
+          <div class="hamper-meta"><span class="hamper-price">₹2,599</span><span class="hamper-old">₹3,100</span></div>
+          <p class="hamper-items">7 curated items</p>
+          <button class="btn btn-sm" data-customize="The Festive Glow">Customize this hamper</button>
+        </article>
+
+        <article class="hamper-card reveal">
+          <div class="hamper-bg"><img src="https://images.unsplash.com/photo-1773450970959-cef81e9b1053?w=900&q=80&auto=format&fit=crop" alt="Wooden welcome crate filled with food, flowers and drink"></div>
+          <p class="hamper-occasion">Housewarming</p>
+          <h3>The Welcome Home Crate</h3>
+          <p class="desc">Coasters, mug, bath set, notebook.</p>
+          <div class="hamper-meta"><span class="hamper-price">₹2,199</span><span class="hamper-old">₹2,600</span></div>
+          <p class="hamper-items">6 curated items</p>
+          <button class="btn btn-sm" data-customize="The Welcome Home Crate">Customize this hamper</button>
+        </article>
+
+        <article class="hamper-card reveal">
+          <div class="hamper-bg"><img src="https://images.unsplash.com/photo-1635874714425-c342060a4c58?w=900&q=80&auto=format&fit=crop" alt="Baby gift hamper with contents laid out"></div>
+          <p class="hamper-occasion">New Baby</p>
+          <h3>The New Beginnings</h3>
+          <p class="desc">Onesie, soft toy, baby essentials, card.</p>
+          <div class="hamper-meta"><span class="hamper-price">₹1,599</span><span class="hamper-old">₹1,900</span></div>
+          <p class="hamper-items">4 curated items</p>
+          <button class="btn btn-sm" data-customize="The New Beginnings">Customize this hamper</button>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="scallop" aria-hidden="true"></div>
+
+  <!-- ============ PROCESS ============ -->
+  <section id="process" class="section">
+    <div class="wrap">
+      <div class="section-head center reveal" style="margin-inline:auto;">
+        <p class="eyebrow" style="justify-content:center;">How it works</p>
+        <h2>Four steps from cart to doorstep</h2>
+      </div>
+      <div class="process-grid reveal-stagger">
+        <div class="process-step reveal"><span class="step-num">01</span><h4>Pick a hamper or build your own</h4><p>Start from a curated design or choose items individually from the shop.</p></div>
+        <div class="process-step reveal"><span class="step-num">02</span><h4>Customize</h4><p>Swap items, add a personal note, or tell us the occasion and budget.</p></div>
+        <div class="process-step reveal"><span class="step-num">03</span><h4>We wrap it by hand</h4><p>Every order is packed and ribboned in-house — nothing is dropshipped.</p></div>
+        <div class="process-step reveal"><span class="step-num">04</span><h4>Delivered, on time</h4><p>Tracked delivery with a date you choose, including same-day in metros.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="scallop flip" aria-hidden="true"></div>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="section alt">
+    <div class="wrap">
+      <div class="testimonial-wrap reveal">
+        <div class="testimonial-slide active">
+          <p>"The hamper arrived looking better than the photos. Every single item felt considered, not just thrown in a box."</p>
+          <p class="testimonial-author">Ritika M. — Birthday Edit</p>
+        </div>
+        <div class="testimonial-slide">
+          <p>"We sent twenty corporate hampers and got more replies from clients than any email campaign we have run."</p>
+          <p class="testimonial-author">Arjun K. — Corporate Gifting</p>
+        </div>
+        <div class="testimonial-slide">
+          <p>"Customization actually meant something here. They swapped two items and it still felt cohesive."</p>
+          <p class="testimonial-author">Priya S. — Welcome Home Crate</p>
+        </div>
+        <div class="testimonial-dots">
+          <button class="active" aria-label="Show testimonial 1"></button>
+          <button aria-label="Show testimonial 2"></button>
+          <button aria-label="Show testimonial 3"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="section">
+    <div class="wrap contact-block">
+      <div class="contact-copy reveal">
+        <p class="eyebrow">Custom orders</p>
+        <h2>Want something built just for the occasion?</h2>
+        <p>Tell us who it's for, the budget, and any items you'd like included. We'll send back a hamper design within a day.</p>
+        <ul class="contact-perks">
+          <li>Free design consultation, no obligation</li>
+          <li>Bulk pricing for 10+ corporate hampers</li>
+          <li>Pan-India delivery, gift-note included</li>
+        </ul>
+      </div>
+
+      <form id="contact-form" class="form-card reveal">
+        <div class="form-row">
+          <div class="field"><label for="name">Your name</label><input type="text" id="name" name="name" placeholder="Ritika Mehta" required></div>
+          <div class="field"><label for="email">Email</label><input type="email" id="email" name="email" placeholder="you@email.com" required></div>
+        </div>
+        <div class="field"><label for="occasion">Occasion / hamper</label><input type="text" id="occasion" name="occasion" placeholder="e.g. The Birthday Edit, or a custom request"></div>
+        <div class="field"><label for="message">Tell us more</label><textarea id="message" name="message" placeholder="Budget, items you'd like included, delivery date…" required></textarea></div>
+        <button type="submit" class="btn btn-primary">Send request</button>
+        <p class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <p class="footer-logo">Wrapt</p>
+        <p>Hand-curated gift hampers and gifts for birthdays, festivals, weddings and corporate giving — wrapped in-house, sent across India.</p>
+      </div>
+      <div class="footer-col"><h5>Shop</h5><ul><li><a href="#products">Products</a></li><li><a href="#hampers">Gift Hampers</a></li><li><a href="#contact">Custom Orders</a></li></ul></div>
+      <div class="footer-col"><h5>Company</h5><ul><li><a href="#process">How it works</a></li><li><a href="#contact">Corporate Gifting</a></li><li><a href="#contact">Contact</a></li></ul></div>
+      <div class="footer-col"><h5>Get in touch</h5><ul><li><a href="mailto:hello@wrapt.example">hello@wrapt.example</a></li><li><a href="tel:+910000000000">+91 00000 00000</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Wrapt. All rights reserved.</span>
+      <div class="social-row"><a href="#" aria-label="Instagram">IG</a><a href="#" aria-label="Facebook">FB</a><a href="#" aria-label="Pinterest">PIN</a></div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast"><span class="dot"></span><span>Item added</span></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  const header = document.querySelector('.site-header');
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 24);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const menuToggle = document.querySelector('.menu-toggle');
+  const mobileNav = document.querySelector('.mobile-nav');
+  const navOverlay = document.querySelector('.nav-overlay');
+  function closeMobileNav(){ mobileNav.classList.remove('open'); navOverlay.classList.remove('open'); }
+  menuToggle?.addEventListener('click', () => { mobileNav.classList.toggle('open'); navOverlay.classList.toggle('open'); });
+  navOverlay?.addEventListener('click', closeMobileNav);
+  mobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobileNav));
+
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('in-view'); io.unobserve(entry.target); } });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => io.observe(el));
+  } else { revealEls.forEach(el => el.classList.add('in-view')); }
+
+  document.querySelectorAll('.reveal-stagger').forEach(group => {
+    [...group.children].forEach((child, i) => child.style.setProperty('--i', i));
+  });
+
+  const counters = document.querySelectorAll('[data-count]');
+  const countUp = (el) => {
+    const target = parseInt(el.dataset.count, 10);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1200;
+    const start = performance.now();
+    function tick(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target) + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  };
+  if ('IntersectionObserver' in window) {
+    const counterIo = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) { countUp(entry.target); counterIo.unobserve(entry.target); } });
+    }, { threshold: 0.5 });
+    counters.forEach(el => counterIo.observe(el));
+  }
+
+  const toast = document.querySelector('.toast');
+  let toastTimer;
+  function showToast(message) {
+    if (!toast) return;
+    toast.querySelector('span:last-child').textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  let cartCount = 0;
+  const cartCountEl = document.querySelector('.cart-count');
+  const cartBtn = document.querySelector('.cart-btn');
+  document.querySelectorAll('.add-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cartCount += 1;
+      if (cartCountEl) cartCountEl.textContent = cartCount;
+      cartBtn?.classList.add('bump');
+      setTimeout(() => cartBtn?.classList.remove('bump'), 300);
+      const name = btn.closest('.card')?.querySelector('h3')?.textContent || 'Item';
+      showToast(`${name} added to your basket`);
+    });
+  });
+
+  document.querySelectorAll('[data-customize]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const hamperName = btn.dataset.customize;
+      const occasionField = document.querySelector('#occasion');
+      if (occasionField) occasionField.value = hamperName;
+      document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+      showToast(`Tell us a bit more about your ${hamperName}`);
+    });
+  });
+
+  const chips = document.querySelectorAll('.filter-chip');
+  const productCards = document.querySelectorAll('.product-grid .card');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const cat = chip.dataset.filter;
+      productCards.forEach(card => {
+        const show = cat === 'all' || card.dataset.category === cat;
+        card.style.display = show ? '' : 'none';
+      });
+    });
+  });
+
+  const slides = document.querySelectorAll('.testimonial-slide');
+  const dots = document.querySelectorAll('.testimonial-dots button');
+  let activeSlide = 0, slideTimer;
+  function goToSlide(index){ slides.forEach((s,i)=>s.classList.toggle('active', i===index)); dots.forEach((d,i)=>d.classList.toggle('active', i===index)); activeSlide=index; }
+  function nextSlide(){ goToSlide((activeSlide+1)%slides.length); }
+  function startAutoSlide(){ clearInterval(slideTimer); slideTimer = setInterval(nextSlide, 5200); }
+  dots.forEach((dot,i) => dot.addEventListener('click', () => { goToSlide(i); startAutoSlide(); }));
+  if (slides.length) { goToSlide(0); startAutoSlide(); }
+
+  // Static-file contact form: no backend here, so we simulate a successful
+  // request locally. Wire this to a real endpoint (PHP, Formspree, etc.)
+  // when you have a server to send it to.
+  const form = document.querySelector('#contact-form');
+  const statusEl = document.querySelector('.form-status');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const name = form.querySelector('#name').value.trim();
+    if (!name) return;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    statusEl.textContent = '';
+    statusEl.classList.remove('success','error');
+    setTimeout(() => {
+      statusEl.textContent = `Thanks, ${name}! This demo form isn't connected to a server yet — hook it up to your backend or a form service to receive real submissions.`;
+      statusEl.classList.add('success');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send request';
+      showToast('Request captured (demo mode)');
+    }, 700);
+  });
+
+});
+</script>
+</body>
+</html>
